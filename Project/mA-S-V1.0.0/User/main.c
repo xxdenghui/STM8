@@ -47,12 +47,15 @@ void TaskProcess(void);
 
 void Task_ADC_Cov(void);
 void Task_SOF_Pwm(void);
+void Task_Blink(void);
+
 void BaseTimer_CallBack( void );
 // task list
 typedef enum Task_List
 {
     TASK_ADC_COV,
 	TASK_SOF_PWM,
+	TASK_BLINK,
     TASKS_MAX
 } Task_List;
 
@@ -61,6 +64,7 @@ static Task_Components_Type Tasks_Type[]=
 {  
   {0, 10, 10, Task_ADC_Cov},			
   {0, 9, 10, Task_SOF_Pwm},
+  {0, 8, 500, Task_Blink},
 };
 
 /* Private functions ---------------------------------------------------------*/
@@ -241,6 +245,10 @@ void Task_SOF_Pwm(void)
             }
         }
     }
+}
+
+void Task_Blink(void){
+	GPIO_WriteReverse(OUT_Port, LED_Pin);
 }
 
 #ifdef USE_FULL_ASSERT
