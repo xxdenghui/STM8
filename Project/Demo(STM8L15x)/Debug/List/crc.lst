@@ -1,0 +1,879 @@
+###############################################################################
+#
+# IAR C/C++ Compiler V3.10.1.201 for STM8                 22/Mar/2019  11:20:54
+# Copyright 2010-2017 IAR Systems AB.
+# Standalone license - IAR Embedded Workbench for STMicroelectronics STM8
+#
+#    Source file  =  G:\Darren\MCU\STM8\Software\Libraries\CRC\crc.c
+#    Command line =  
+#        -f C:\Users\new06\AppData\Local\Temp\EWAFD5.tmp
+#        (G:\Darren\MCU\STM8\Software\Libraries\CRC\crc.c -e -On --no_cse
+#        --no_unroll --no_inline --no_code_motion --no_tbaa --no_cross_call
+#        --debug --code_model small --data_model medium -o
+#        "G:\Darren\MCU\STM8\Software\Project\Demo(STM8L15x)\Debug\Obj"
+#        --dlib_config "D:\Program Files (x86)\IAR Systems\Embedded Workbench
+#        8.0\stm8\LIB\dlstm8smn.h" -D STM8L15 -lCN
+#        "G:\Darren\MCU\STM8\Software\Project\Demo(STM8L15x)\Debug\List" -lB
+#        "G:\Darren\MCU\STM8\Software\Project\Demo(STM8L15x)\Debug\List" -I
+#        "G:\Darren\MCU\STM8\Software\Project\Demo(STM8L15x)\..\..\Libraries\STM8L15x_StdPeriph_Driver\inc\"
+#        -I
+#        "G:\Darren\MCU\STM8\Software\Project\Demo(STM8L15x)\..\..\Libraries\Device\"
+#        -I
+#        "G:\Darren\MCU\STM8\Software\Project\Demo(STM8L15x)\..\..\Libraries\HAL\"
+#        -I
+#        "G:\Darren\MCU\STM8\Software\Project\Demo(STM8L15x)\..\..\Libraries\Bus\"
+#        -I
+#        "G:\Darren\MCU\STM8\Software\Project\Demo(STM8L15x)\..\..\Libraries\CRC\"
+#        -I "G:\Darren\MCU\STM8\Software\Project\Demo(STM8L15x)\User\" --vregs
+#        16)
+#    Locale       =  Chinese (Simplified)_CHN.936
+#    List file    =  
+#        G:\Darren\MCU\STM8\Software\Project\Demo(STM8L15x)\Debug\List\crc.lst
+#    Object file  =  
+#        G:\Darren\MCU\STM8\Software\Project\Demo(STM8L15x)\Debug\Obj\crc.o
+#
+###############################################################################
+
+G:\Darren\MCU\STM8\Software\Libraries\CRC\crc.c
+      1          /**
+      2            ******************************************************************************
+      3            * @file    crc.c
+      4            * @author  Darren Tang
+      5            * @version V1.0.0
+      6            * @date    2015-01-26
+      7            * @brief   This is a CRC Check seous file.
+      8            ******************************************************************************
+      9            * @attention
+     10            *
+     11            * 
+     12            ******************************************************************************
+     13            */
+     14          
+     15          /* Includes ------------------------------------------------------------------*/
+     16          #include "crc.h"
+     17          
+     18          /* Private typedef -----------------------------------------------------------*/
+     19          
+     20          /* Private define ------------------------------------------------------------*/
+     21          
+     22          /* Private macro -------------------------------------------------------------*/
+     23          
+     24          /* Private variables ---------------------------------------------------------*/
+     25          /* CRC8 Check array */
+
+   \                                 In section .near.rodata, align 1
+     26          const unsigned char crc8_array[256] = {
+   \                     crc8_array:
+   \   000000 00 5E BC E2  DC8 0, 94, 188, 226, 97, 63, 221, 131, 194, 156, 126, 32, 163, 253, 31
+   \          61 3F DD 83 
+   \   00000F 41 9D C3 21  DC8 65, 157, 195, 33, 127, 252, 162, 64, 30, 95, 1, 227, 189, 62, 96
+   \          7F FC A2 40 
+   \   00001E 82 DC 23 7D  DC8 130, 220, 35, 125, 159, 193, 66, 28, 254, 160, 225, 191, 93, 3, 128
+   \          9F C1 42 1C 
+   \   00002D DE 3C 62 BE  DC8 222, 60, 98, 190, 224, 2, 92, 223, 129, 99, 61, 124, 34, 192, 158
+   \          E0 02 5C DF 
+   \   00003C 1D 43 A1 FF  DC8 29, 67, 161, 255, 70, 24, 250, 164, 39, 121, 155, 197, 132, 218, 56
+   \          46 18 FA A4 
+   \   00004B 66 E5 BB 59  DC8 102, 229, 187, 89, 7, 219, 133, 103, 57, 186, 228, 6, 88, 25, 71
+   \          07 DB 85 67 
+   \   00005A A5 FB 78 26  DC8 165, 251, 120, 38, 196, 154, 101, 59, 217, 135, 4, 90, 184, 230
+   \          C4 9A 65 3B 
+   \   000068 A7 F9 1B 45  DC8 167, 249, 27, 69, 198, 152, 122, 36, 248, 166, 68, 26, 153, 199, 37
+   \          C6 98 7A 24 
+   \   000077 7B 3A 64 86  DC8 123, 58, 100, 134, 216, 91, 5, 231, 185, 140, 210, 48, 110, 237
+   \          D8 5B 05 E7 
+   \   000085 B3 51 0F 4E  DC8 179, 81, 15, 78, 16, 242, 172, 47, 113, 147, 205, 17, 79, 173, 243
+   \          10 F2 AC 2F 
+   \   000094 70 2E CC 92  DC8 112, 46, 204, 146, 211, 141, 111, 49, 178, 236, 14, 80, 175, 241
+   \          D3 8D 6F 31 
+   \   0000A2 13 4D CE 90  DC8 19, 77, 206, 144, 114, 44, 109, 51, 209, 143, 12, 82, 176, 238, 50
+   \          72 2C 6D 33 
+   \   0000B1 6C 8E D0 53  DC8 108, 142, 208, 83, 13, 239, 177, 240, 174, 76, 18, 145, 207, 45
+   \          0D EF B1 F0 
+   \   0000BF 73 CA 94 76  DC8 115, 202, 148, 118, 40, 171, 245, 23, 73, 8, 86, 180, 234, 105, 55
+   \          28 AB F5 17 
+   \   0000CE D5 8B 57 09  DC8 213, 139, 87, 9, 235, 181, 54, 104, 138, 212, 149, 203, 41, 119
+   \          EB B5 36 68 
+   \   0000DC F4 AA 48 16  DC8 244, 170, 72, 22, 233, 183, 85, 11, 136, 214, 52, 106, 43, 117, 151
+   \          E9 B7 55 0B 
+   \   0000EB C9 4A 14 F6  DC8 201, 74, 20, 246, 168, 116, 42, 200, 150, 21, 75, 169, 247, 182
+   \          A8 74 2A C8 
+   \   0000F9 E8 0A 54 D7  DC8 232, 10, 84, 215, 137, 107, 53
+   \          89 6B 35    
+     27          0x00, 0x5e, 0xbc, 0xe2, 0x61, 0x3f, 0xdd, 0x83,
+     28          0xc2, 0x9c, 0x7e, 0x20, 0xa3, 0xfd, 0x1f, 0x41,
+     29          0x9d, 0xc3, 0x21, 0x7f, 0xfc, 0xa2, 0x40, 0x1e,
+     30          0x5f, 0x01, 0xe3, 0xbd, 0x3e, 0x60, 0x82, 0xdc,
+     31          0x23, 0x7d, 0x9f, 0xc1, 0x42, 0x1c, 0xfe, 0xa0,
+     32          0xe1, 0xbf, 0x5d, 0x03, 0x80, 0xde, 0x3c, 0x62,
+     33          0xbe, 0xe0, 0x02, 0x5c, 0xdf, 0x81, 0x63, 0x3d,
+     34          0x7c, 0x22, 0xc0, 0x9e, 0x1d, 0x43, 0xa1, 0xff,
+     35          0x46, 0x18, 0xfa, 0xa4, 0x27, 0x79, 0x9b, 0xc5,
+     36          0x84, 0xda, 0x38, 0x66, 0xe5, 0xbb, 0x59, 0x07,
+     37          0xdb, 0x85, 0x67, 0x39, 0xba, 0xe4, 0x06, 0x58,
+     38          0x19, 0x47, 0xa5, 0xfb, 0x78, 0x26, 0xc4, 0x9a,
+     39          0x65, 0x3b, 0xd9, 0x87, 0x04, 0x5a, 0xb8, 0xe6,
+     40          0xa7, 0xf9, 0x1b, 0x45, 0xc6, 0x98, 0x7a, 0x24,
+     41          0xf8, 0xa6, 0x44, 0x1a, 0x99, 0xc7, 0x25, 0x7b,
+     42          0x3a, 0x64, 0x86, 0xd8, 0x5b, 0x05, 0xe7, 0xb9,
+     43          0x8c, 0xd2, 0x30, 0x6e, 0xed, 0xb3, 0x51, 0x0f,
+     44          0x4e, 0x10, 0xf2, 0xac, 0x2f, 0x71, 0x93, 0xcd,
+     45          0x11, 0x4f, 0xad, 0xf3, 0x70, 0x2e, 0xcc, 0x92,
+     46          0xd3, 0x8d, 0x6f, 0x31, 0xb2, 0xec, 0x0e, 0x50,
+     47          0xaf, 0xf1, 0x13, 0x4d, 0xce, 0x90, 0x72, 0x2c,
+     48          0x6d, 0x33, 0xd1, 0x8f, 0x0c, 0x52, 0xb0, 0xee,
+     49          0x32, 0x6c, 0x8e, 0xd0, 0x53, 0x0d, 0xef, 0xb1,
+     50          0xf0, 0xae, 0x4c, 0x12, 0x91, 0xcf, 0x2d, 0x73,
+     51          0xca, 0x94, 0x76, 0x28, 0xab, 0xf5, 0x17, 0x49,
+     52          0x08, 0x56, 0xb4, 0xea, 0x69, 0x37, 0xd5, 0x8b,
+     53          0x57, 0x09, 0xeb, 0xb5, 0x36, 0x68, 0x8a, 0xd4,
+     54          0x95, 0xcb, 0x29, 0x77, 0xf4, 0xaa, 0x48, 0x16,
+     55          0xe9, 0xb7, 0x55, 0x0b, 0x88, 0xd6, 0x34, 0x6a,
+     56          0x2b, 0x75, 0x97, 0xc9, 0x4a, 0x14, 0xf6, 0xa8,
+     57          0x74, 0x2a, 0xc8, 0x96, 0x15, 0x4b, 0xa9, 0xf7,
+     58          0xb6, 0xe8, 0x0a, 0x54, 0xd7, 0x89, 0x6b, 0x35,
+     59          };
+     60          
+     61          /* Private function prototypes -----------------------------------------------*/
+     62          
+     63          /* Private functions ---------------------------------------------------------*/
+     64          /**
+     65            * @brief  CRC8 one byte Calan Cheack
+     66            * values.
+     67            * @param  
+     68            *    byte- The check byte
+     69            * @retval 
+     70            *    CRC8-
+     71            */
+
+   \                                 In section .near_func.text, align 1
+     72          unsigned char CalCRC_OneByte( unsigned char byte )  // 0x18=> 00011000 X8 + X5 + X4 + 1 
+     73          {
+   \                     CalCRC_OneByte:
+   \   000000 B7 ..        LD        S:?b1, A
+     74           unsigned char i,CRC_OneByte;
+     75           CRC_OneByte = 0;
+   \   000002 3F ..        CLR       S:?b2
+     76           for ( i=0; i<8 ;i++ )
+   \   000004 3F ..        CLR       S:?b0
+   \                     ??CalCRC_OneByte_0:
+   \   000006 B6 ..        LD        A, S:?b0
+   \   000008 A1 08        CP        A, #0x8
+   \   00000A 24 2B        JRNC      L:??CalCRC_OneByte_1
+     77           {
+     78             if ( ( CRC_OneByte ^ byte ) & 0x01 )
+   \   00000C B6 ..        LD        A, S:?b1
+   \   00000E B8 ..        XOR       A, S:?b2
+   \   000010 A4 01        AND       A, #0x1
+   \   000012 A1 00        CP        A, #0x0
+   \   000014 27 13        JREQ      L:??CalCRC_OneByte_2
+     79             {
+     80              CRC_OneByte ^= 0x18;
+   \   000016 B6 ..        LD        A, S:?b2
+   \   000018 A8 18        XOR       A, #0x18
+   \   00001A B7 ..        LD        S:?b2, A
+     81              CRC_OneByte >>= 1;
+   \   00001C B6 ..        LD        A, S:?b2
+   \   00001E 44           SRL       A
+   \   00001F B7 ..        LD        S:?b2, A
+     82              CRC_OneByte |= 0x80;
+   \   000021 B6 ..        LD        A, S:?b2
+   \   000023 AA 80        OR        A, #0x80
+   \   000025 B7 ..        LD        S:?b2, A
+   \   000027 20 05        JRA       L:??CalCRC_OneByte_3
+     83             }      
+     84             else 
+     85               CRC_OneByte >>= 1;
+   \                     ??CalCRC_OneByte_2:
+   \   000029 B6 ..        LD        A, S:?b2
+   \   00002B 44           SRL       A
+   \   00002C B7 ..        LD        S:?b2, A
+     86               byte >>= 1;
+   \                     ??CalCRC_OneByte_3:
+   \   00002E B6 ..        LD        A, S:?b1
+   \   000030 44           SRL       A
+   \   000031 B7 ..        LD        S:?b1, A
+     87           }
+   \   000033 3C ..        INC       S:?b0
+   \   000035 20 CF        JRA       L:??CalCRC_OneByte_0
+     88           return CRC_OneByte;
+   \                     ??CalCRC_OneByte_1:
+   \   000037 B6 ..        LD        A, S:?b2
+   \   000039 81           RET
+     89          }
+     90          
+     91          /* Public functions ----------------------------------------------------------*/
+     92          
+     93          /**
+     94            * @brief  CRC Table Check
+     95            * values.
+     96            * @param  
+     97            *    p- The data add
+     98            *    Lenth- Bytes to be check
+     99            * @retval 
+    100            *    CRC8-
+    101            */ 
+
+   \                                 In section .near_func.text, align 1
+    102          unsigned char CRC8_Table(unsigned char *p, unsigned char Lenth)
+    103          {
+   \                     CRC8_Table:
+   \   000000 9093         LDW       Y, X
+   \   000002 B7 ..        LD        S:?b1, A
+    104              unsigned char crc8 = 0;
+   \   000004 3F ..        CLR       S:?b2
+    105              unsigned char counter;
+    106              for( counter = Lenth; counter > 0; counter-- )
+   \   000006 45 .. ..     MOV       S:?b0, S:?b1
+   \                     ??CRC8_Table_0:
+   \   000009 3D ..        TNZ       S:?b0
+   \   00000B 27 11        JREQ      L:??CRC8_Table_1
+    107              {
+    108                  crc8 = crc8_array[crc8^*p]; //Check for CRC
+   \   00000D 90F6         LD        A, (Y)
+   \   00000F B8 ..        XOR       A, S:?b2
+   \   000011 5F           CLRW      X
+   \   000012 97           LD        XL, A
+   \   000013 D6 ....      LD        A, (L:crc8_array,X)
+   \   000016 B7 ..        LD        S:?b2, A
+    109                  p++;
+   \   000018 905C         INCW      Y
+    110              }
+   \   00001A 3A ..        DEC       S:?b0
+   \   00001C 20 EB        JRA       L:??CRC8_Table_0
+    111              return crc8;
+   \                     ??CRC8_Table_1:
+   \   00001E B6 ..        LD        A, S:?b2
+   \   000020 81           RET
+    112          }
+    113          
+    114          /**
+    115            * @brief  CRC8 Calan Cheack
+    116            * values.
+    117            * @param  
+    118            *    p- The check bytes add
+    119            *    Lenth- Bytes to be check
+    120            * @retval 
+    121            *    CRC8-
+    122            */
+
+   \                                 In section .near_func.text, align 1
+    123          unsigned char CalCRC_Bytes( unsigned char *p, unsigned char Lenth )
+    124          {
+   \                     CalCRC_Bytes:
+   \   000000 B7 ..        LD        S:?b3, A
+    125           unsigned char CRC = 0;
+   \   000002 3F ..        CLR       S:?b4
+    126           while ( Lenth-- )
+   \                     ??CalCRC_Bytes_0:
+   \   000004 B6 ..        LD        A, S:?b3
+   \   000006 B7 ..        LD        S:?b3, A
+   \   000008 3A ..        DEC       S:?b3
+   \   00000A 4D           TNZ       A
+   \   00000B 27 0B        JREQ      L:??CalCRC_Bytes_1
+    127           { 
+    128              CRC = CalCRC_OneByte( CRC ^ *p++ ); 
+   \   00000D F6           LD        A, (X)
+   \   00000E B8 ..        XOR       A, S:?b4
+   \   000010 CD ....      CALL      L:CalCRC_OneByte
+   \   000013 B7 ..        LD        S:?b4, A
+   \   000015 5C           INCW      X
+   \   000016 20 EC        JRA       L:??CalCRC_Bytes_0
+    129           }
+    130           return CRC;
+   \                     ??CalCRC_Bytes_1:
+   \   000018 B6 ..        LD        A, S:?b4
+   \   00001A 81           RET
+    131          }
+    132          
+    133          /**
+    134            * @brief  get max val in counts of numbers
+    135            * values.
+    136            * @param  
+    137            *    num  - numbers
+    138            * @retval 
+    139            *    the maxval
+    140            */
+
+   \                                 In section .near_func.text, align 1
+    141          unsigned char max( unsigned char* num, unsigned char counts )
+    142          {
+   \                     max:
+   \   000000 B7 ..        LD        S:?b4, A
+    143            unsigned char maxval = 0;
+   \   000002 3F ..        CLR       S:?b1
+    144            for ( unsigned char i=0; i<counts; i++ ){
+   \   000004 3F ..        CLR       S:?b0
+   \                     ??max_0:
+   \   000006 B6 ..        LD        A, S:?b0
+   \   000008 B1 ..        CP        A, S:?b4
+   \   00000A 24 26        JRNC      L:??max_1
+    145              if (maxval < num[i])
+   \   00000C 905F         CLRW      Y
+   \   00000E B6 ..        LD        A, S:?b0
+   \   000010 9097         LD        YL, A
+   \   000012 BF ..        LDW       S:?w1, X
+   \   000014 72B9 ....    ADDW      Y, S:?w1
+   \   000018 B6 ..        LD        A, S:?b1
+   \   00001A 90F1         CP        A, (Y)
+   \   00001C 24 10        JRNC      L:??max_2
+    146                maxval = num[i];
+   \   00001E 905F         CLRW      Y
+   \   000020 B6 ..        LD        A, S:?b0
+   \   000022 9097         LD        YL, A
+   \   000024 BF ..        LDW       S:?w1, X
+   \   000026 72B9 ....    ADDW      Y, S:?w1
+   \   00002A 90F6         LD        A, (Y)
+   \   00002C B7 ..        LD        S:?b1, A
+    147            }
+   \                     ??max_2:
+   \   00002E 3C ..        INC       S:?b0
+   \   000030 20 D4        JRA       L:??max_0
+    148            return maxval;
+   \                     ??max_1:
+   \   000032 B6 ..        LD        A, S:?b1
+   \   000034 81           RET
+    149          }
+    150          
+    151          
+    152          /**
+    153            * @brief  numbers to string
+    154            * values.
+    155            * @param  
+    156            *    num  - numbers
+    157            *    *str - string
+    158            * @retval 
+    159            *    none
+    160            */
+
+   \                                 In section .near_func.text, align 1
+    161          void Dec2String( unsigned char num, char *str )
+    162          {
+   \                     Dec2String:
+   \   000000 B7 ..        LD        S:?b0, A
+   \   000002 9093         LDW       Y, X
+    163            *str = num/100 + ASCII_NUM_0;
+   \   000004 A6 64        LD        A, #0x64
+   \   000006 5F           CLRW      X
+   \   000007 01           RRWA      X, A
+   \   000008 B6 ..        LD        A, S:?b0
+   \   00000A 02           RLWA      X, A
+   \   00000B 62           DIV       X, A
+   \   00000C 9F           LD        A, XL
+   \   00000D AB 30        ADD       A, #0x30
+   \   00000F 90F7         LD        (Y), A
+    164            if ( *str != ASCII_NUM_0 )
+   \   000011 90F6         LD        A, (Y)
+   \   000013 A1 30        CP        A, #0x30
+   \   000015 27 02        JREQ      L:??Dec2String_0
+    165              str++;
+   \   000017 905C         INCW      Y
+    166            *str = num/10%10 + ASCII_NUM_0;
+   \                     ??Dec2String_0:
+   \   000019 A6 0A        LD        A, #0xa
+   \   00001B 5F           CLRW      X
+   \   00001C 01           RRWA      X, A
+   \   00001D B6 ..        LD        A, S:?b0
+   \   00001F 02           RLWA      X, A
+   \   000020 62           DIV       X, A
+   \   000021 41           EXG       A, XL
+   \   000022 B7 ..        LD        S:?b1, A
+   \   000024 41           EXG       A, XL
+   \   000025 A6 0A        LD        A, #0xa
+   \   000027 5F           CLRW      X
+   \   000028 01           RRWA      X, A
+   \   000029 B6 ..        LD        A, S:?b1
+   \   00002B 02           RLWA      X, A
+   \   00002C 62           DIV       X, A
+   \   00002D AB 30        ADD       A, #0x30
+   \   00002F 90F7         LD        (Y), A
+    167            str++;
+   \   000031 905C         INCW      Y
+    168            *str = num%10 + ASCII_NUM_0;
+   \   000033 A6 0A        LD        A, #0xa
+   \   000035 5F           CLRW      X
+   \   000036 01           RRWA      X, A
+   \   000037 B6 ..        LD        A, S:?b0
+   \   000039 02           RLWA      X, A
+   \   00003A 62           DIV       X, A
+   \   00003B AB 30        ADD       A, #0x30
+   \   00003D 90F7         LD        (Y), A
+    169            str++;
+   \   00003F 905C         INCW      Y
+    170            *str = '\0';
+   \   000041 907F         CLR       (Y)
+    171          }
+   \   000043 81           RET
+    172          
+    173          
+    174          /**
+    175            * @brief  BCD to string
+    176            * values.
+    177            * @param  
+    178            *    num  - BCD numbers
+    179            *    *str - string
+    180            * @retval 
+    181            *    none
+    182            */
+
+   \                                 In section .near_func.text, align 1
+    183          void BCD2String( unsigned char num, char *str )
+    184          {
+   \                     BCD2String:
+   \   000000 B7 ..        LD        S:?b0, A
+   \   000002 9093         LDW       Y, X
+    185            *str = num/16 + ASCII_NUM_0;
+   \   000004 A6 10        LD        A, #0x10
+   \   000006 5F           CLRW      X
+   \   000007 01           RRWA      X, A
+   \   000008 B6 ..        LD        A, S:?b0
+   \   00000A 02           RLWA      X, A
+   \   00000B 62           DIV       X, A
+   \   00000C 9F           LD        A, XL
+   \   00000D AB 30        ADD       A, #0x30
+   \   00000F 90F7         LD        (Y), A
+    186            str++;
+   \   000011 905C         INCW      Y
+    187            *str = num%16 + ASCII_NUM_0;
+   \   000013 A6 10        LD        A, #0x10
+   \   000015 5F           CLRW      X
+   \   000016 01           RRWA      X, A
+   \   000017 B6 ..        LD        A, S:?b0
+   \   000019 02           RLWA      X, A
+   \   00001A 62           DIV       X, A
+   \   00001B AB 30        ADD       A, #0x30
+   \   00001D 90F7         LD        (Y), A
+    188            str++;
+   \   00001F 905C         INCW      Y
+    189            *str = ' ';
+   \   000021 A6 20        LD        A, #0x20
+   \   000023 90F7         LD        (Y), A
+    190            str++;
+   \   000025 905C         INCW      Y
+    191            *str = '\0';
+   \   000027 907F         CLR       (Y)
+    192          }
+   \   000029 81           RET
+    193          
+    194          /**
+    195            * @brief  Hex to string
+    196            * values.
+    197            * @param  
+    198            *    hex  - HEX numbers
+    199            *    *str - string
+    200            * @retval 
+    201            *    none
+    202            */
+
+   \                                 In section .near_func.text, align 1
+    203          void Hex2String( unsigned char hex, char *str )
+    204          {
+   \                     Hex2String:
+   \   000000 B7 ..        LD        S:?b0, A
+   \   000002 9093         LDW       Y, X
+    205            if ( hex/16 <= 9 )
+   \   000004 A6 10        LD        A, #0x10
+   \   000006 5F           CLRW      X
+   \   000007 01           RRWA      X, A
+   \   000008 B6 ..        LD        A, S:?b0
+   \   00000A 02           RLWA      X, A
+   \   00000B 62           DIV       X, A
+   \   00000C 9F           LD        A, XL
+   \   00000D A1 0A        CP        A, #0xa
+   \   00000F 24 0F        JRNC      L:??Hex2String_0
+    206              *str = hex/16 + ASCII_NUM_0;
+   \   000011 A6 10        LD        A, #0x10
+   \   000013 5F           CLRW      X
+   \   000014 01           RRWA      X, A
+   \   000015 B6 ..        LD        A, S:?b0
+   \   000017 02           RLWA      X, A
+   \   000018 62           DIV       X, A
+   \   000019 9F           LD        A, XL
+   \   00001A AB 30        ADD       A, #0x30
+   \   00001C 90F7         LD        (Y), A
+   \   00001E 20 0D        JRA       L:??Hex2String_1
+    207            else *str = hex/16 + ASCII_NUM_0 + 7;
+   \                     ??Hex2String_0:
+   \   000020 A6 10        LD        A, #0x10
+   \   000022 5F           CLRW      X
+   \   000023 01           RRWA      X, A
+   \   000024 B6 ..        LD        A, S:?b0
+   \   000026 02           RLWA      X, A
+   \   000027 62           DIV       X, A
+   \   000028 9F           LD        A, XL
+   \   000029 AB 37        ADD       A, #0x37
+   \   00002B 90F7         LD        (Y), A
+    208            str++; 
+   \                     ??Hex2String_1:
+   \   00002D 905C         INCW      Y
+    209            if ( hex%16 <= 9 )
+   \   00002F A6 10        LD        A, #0x10
+   \   000031 5F           CLRW      X
+   \   000032 01           RRWA      X, A
+   \   000033 B6 ..        LD        A, S:?b0
+   \   000035 02           RLWA      X, A
+   \   000036 62           DIV       X, A
+   \   000037 A1 0A        CP        A, #0xa
+   \   000039 24 0E        JRNC      L:??Hex2String_2
+    210              *str = hex%16 + ASCII_NUM_0;
+   \   00003B A6 10        LD        A, #0x10
+   \   00003D 5F           CLRW      X
+   \   00003E 01           RRWA      X, A
+   \   00003F B6 ..        LD        A, S:?b0
+   \   000041 02           RLWA      X, A
+   \   000042 62           DIV       X, A
+   \   000043 AB 30        ADD       A, #0x30
+   \   000045 90F7         LD        (Y), A
+   \   000047 20 0C        JRA       L:??Hex2String_3
+    211            else *str = hex%16 + ASCII_NUM_0 + 7;
+   \                     ??Hex2String_2:
+   \   000049 A6 10        LD        A, #0x10
+   \   00004B 5F           CLRW      X
+   \   00004C 01           RRWA      X, A
+   \   00004D B6 ..        LD        A, S:?b0
+   \   00004F 02           RLWA      X, A
+   \   000050 62           DIV       X, A
+   \   000051 AB 37        ADD       A, #0x37
+   \   000053 90F7         LD        (Y), A
+    212            str++;
+   \                     ??Hex2String_3:
+   \   000055 905C         INCW      Y
+    213            *str = ' ';
+   \   000057 A6 20        LD        A, #0x20
+   \   000059 90F7         LD        (Y), A
+    214            str++;
+   \   00005B 905C         INCW      Y
+    215            *str = '\0';
+   \   00005D 907F         CLR       (Y)
+    216          }
+   \   00005F 81           RET
+    217          
+
+   \                                 In section .near_func.text, align 1
+    218          void ByteToHexStr(const unsigned char* source, char* dest, int sourceLen)  
+    219          {  
+   \                     ByteToHexStr:
+   \   000000 BF ..        LDW       S:?w2, X
+   \   000002 90BF ..      LDW       S:?w3, Y
+   \   000005 CD ....      CALL      L:?mov_w1_w0
+    220              short i;  
+    221              unsigned char highByte, lowByte;  
+    222            
+    223              for (i = 0; i < sourceLen; i++)  
+   \   000008 5F           CLRW      X
+   \   000009 9093         LDW       Y, X
+   \                     ??ByteToHexStr_0:
+   \   00000B 90B3 ..      CPW       Y, S:?w1
+   \   00000E 2E 5F        JRSGE     L:??ByteToHexStr_1
+    224              {  
+    225                  highByte = source[i] >> 4;  
+   \   000010 93           LDW       X, Y
+   \   000011 72BB ....    ADDW      X, S:?w2
+   \   000015 F6           LD        A, (X)
+   \   000016 4E           SWAP      A
+   \   000017 A4 0F        AND       A, #0xf
+   \   000019 B7 ..        LD        S:?b1, A
+    226                  lowByte = source[i] & 0x0f ;  
+   \   00001B 93           LDW       X, Y
+   \   00001C 72BB ....    ADDW      X, S:?w2
+   \   000020 F6           LD        A, (X)
+   \   000021 A4 0F        AND       A, #0xf
+   \   000023 B7 ..        LD        S:?b0, A
+    227            
+    228                  highByte += 0x30;  
+   \   000025 B6 ..        LD        A, S:?b1
+   \   000027 AB 30        ADD       A, #0x30
+   \   000029 B7 ..        LD        S:?b1, A
+    229            
+    230                  if (highByte > 0x39)  
+   \   00002B B6 ..        LD        A, S:?b1
+   \   00002D A1 3A        CP        A, #0x3a
+   \   00002F 25 0D        JRC       L:??ByteToHexStr_2
+    231                          dest[i * 2] = highByte + 0x07;  
+   \   000031 93           LDW       X, Y
+   \   000032 58           SLLW      X
+   \   000033 72BB ....    ADDW      X, S:?w3
+   \   000037 B6 ..        LD        A, S:?b1
+   \   000039 AB 07        ADD       A, #0x7
+   \   00003B F7           LD        (X), A
+   \   00003C 20 09        JRA       L:??ByteToHexStr_3
+    232                  else  
+    233                          dest[i * 2] = highByte;  
+   \                     ??ByteToHexStr_2:
+   \   00003E 93           LDW       X, Y
+   \   00003F 58           SLLW      X
+   \   000040 72BB ....    ADDW      X, S:?w3
+   \   000044 B6 ..        LD        A, S:?b1
+   \   000046 F7           LD        (X), A
+    234            
+    235                  lowByte += 0x30;  
+   \                     ??ByteToHexStr_3:
+   \   000047 B6 ..        LD        A, S:?b0
+   \   000049 AB 30        ADD       A, #0x30
+   \   00004B B7 ..        LD        S:?b0, A
+    236                  if (lowByte > 0x39)  
+   \   00004D B6 ..        LD        A, S:?b0
+   \   00004F A1 3A        CP        A, #0x3a
+   \   000051 25 0E        JRC       L:??ByteToHexStr_4
+    237                      dest[i * 2 + 1] = lowByte + 0x07;  
+   \   000053 93           LDW       X, Y
+   \   000054 58           SLLW      X
+   \   000055 72BB ....    ADDW      X, S:?w3
+   \   000059 5C           INCW      X
+   \   00005A B6 ..        LD        A, S:?b0
+   \   00005C AB 07        ADD       A, #0x7
+   \   00005E F7           LD        (X), A
+   \   00005F 20 0A        JRA       L:??ByteToHexStr_5
+    238                  else  
+    239                      dest[i * 2 + 1] = lowByte;  
+   \                     ??ByteToHexStr_4:
+   \   000061 93           LDW       X, Y
+   \   000062 58           SLLW      X
+   \   000063 72BB ....    ADDW      X, S:?w3
+   \   000067 5C           INCW      X
+   \   000068 B6 ..        LD        A, S:?b0
+   \   00006A F7           LD        (X), A
+    240              }  
+   \                     ??ByteToHexStr_5:
+   \   00006B 905C         INCW      Y
+   \   00006D 20 9C        JRA       L:??ByteToHexStr_0
+    241              return ;  
+   \                     ??ByteToHexStr_1:
+   \   00006F 81           RET
+    242          } 
+    243          
+
+   \                                 In section .near_func.text, align 1
+    244          void HexStrToByte(const char* source, unsigned char* dest, int sourceLen)  
+    245          {  
+   \                     HexStrToByte:
+   \   000000 CD ....      CALL      L:?push_l2
+   \   000003 CD ....      CALL      L:?push_l3
+   \   000006 89           PUSHW     X
+   \   000007 90BF ..      LDW       S:?w6, Y
+   \   00000A CD ....      CALL      L:?mov_w5_w0
+    246              short i;  
+    247              unsigned char highByte, lowByte;  
+    248                
+    249              for (i = 0; i < sourceLen; i += 2)  
+   \   00000D 5F           CLRW      X
+   \   00000E BF ..        LDW       S:?w4, X
+   \                     ??HexStrToByte_0:
+   \   000010 BE ..        LDW       X, S:?w4
+   \   000012 B3 ..        CPW       X, S:?w5
+   \   000014 2E 62        JRSGE     L:??HexStrToByte_1
+    250              {  
+    251                  highByte = toupper(source[i]);  
+   \   000016 BE ..        LDW       X, S:?w4
+   \   000018 72FB 01      ADDW      X, (0x1,SP)
+   \   00001B F6           LD        A, (X)
+   \   00001C 5F           CLRW      X
+   \   00001D 97           LD        XL, A
+   \   00001E CD ....      CALL      L:toupper
+   \   000021 9F           LD        A, XL
+   \   000022 B7 ..        LD        S:?b14, A
+    252                  lowByte  = toupper(source[i + 1]);  
+   \   000024 BE ..        LDW       X, S:?w4
+   \   000026 72FB 01      ADDW      X, (0x1,SP)
+   \   000029 5C           INCW      X
+   \   00002A F6           LD        A, (X)
+   \   00002B 5F           CLRW      X
+   \   00002C 97           LD        XL, A
+   \   00002D CD ....      CALL      L:toupper
+   \   000030 9F           LD        A, XL
+   \   000031 B7 ..        LD        S:?b15, A
+    253            
+    254                  if (highByte > 0x39)  
+   \   000033 B6 ..        LD        A, S:?b14
+   \   000035 A1 3A        CP        A, #0x3a
+   \   000037 25 08        JRC       L:??HexStrToByte_2
+    255                      highByte -= 0x37;  
+   \   000039 B6 ..        LD        A, S:?b14
+   \   00003B AB C9        ADD       A, #0xc9
+   \   00003D B7 ..        LD        S:?b14, A
+   \   00003F 20 06        JRA       L:??HexStrToByte_3
+    256                  else  
+    257                      highByte -= 0x30;  
+   \                     ??HexStrToByte_2:
+   \   000041 B6 ..        LD        A, S:?b14
+   \   000043 AB D0        ADD       A, #0xd0
+   \   000045 B7 ..        LD        S:?b14, A
+    258            
+    259                  if (lowByte > 0x39)  
+   \                     ??HexStrToByte_3:
+   \   000047 B6 ..        LD        A, S:?b15
+   \   000049 A1 3A        CP        A, #0x3a
+   \   00004B 25 08        JRC       L:??HexStrToByte_4
+    260                      lowByte -= 0x37;  
+   \   00004D B6 ..        LD        A, S:?b15
+   \   00004F AB C9        ADD       A, #0xc9
+   \   000051 B7 ..        LD        S:?b15, A
+   \   000053 20 06        JRA       L:??HexStrToByte_5
+    261                  else  
+    262                      lowByte -= 0x30;  
+   \                     ??HexStrToByte_4:
+   \   000055 B6 ..        LD        A, S:?b15
+   \   000057 AB D0        ADD       A, #0xd0
+   \   000059 B7 ..        LD        S:?b15, A
+    263            
+    264                  dest[i / 2] = (highByte << 4) | lowByte;  
+   \                     ??HexStrToByte_5:
+   \   00005B B6 ..        LD        A, S:?b14
+   \   00005D 4E           SWAP      A
+   \   00005E A4 F0        AND       A, #0xf0
+   \   000060 BA ..        OR        A, S:?b15
+   \   000062 90AE 0002    LDW       Y, #0x2
+   \   000066 BE ..        LDW       X, S:?w4
+   \   000068 CD ....      CALL      L:?sdiv16_x_x_y
+   \   00006B 72BB ....    ADDW      X, S:?w6
+   \   00006F F7           LD        (X), A
+    265              }  
+   \   000070 BE ..        LDW       X, S:?w4
+   \   000072 5C           INCW      X
+   \   000073 5C           INCW      X
+   \   000074 BF ..        LDW       S:?w4, X
+   \   000076 20 98        JRA       L:??HexStrToByte_0
+    266              return ;  
+   \                     ??HexStrToByte_1:
+   \   000078 5B 02        ADD       SP, #0x2
+   \   00007A CC ....      JP        L:?epilogue_l2_l3
+    267          } 
+    268          
+    269          
+    270          /**
+    271            * @brief  check sum
+    272            * values.
+    273            * @param  
+    274            *    *num  - check array
+    275            *    start - the start array number
+    276            *    end   - the end array number
+    277            * @retval 
+    278            *    none
+    279            */
+
+   \                                 In section .near_func.text, align 1
+    280          unsigned char CheckSum( unsigned char* num, unsigned char start, unsigned char end )
+    281          {
+   \                     CheckSum:
+   \   000000 B7 ..        LD        S:?b4, A
+    282            unsigned char sum = 0;
+   \   000002 3F ..        CLR       S:?b5
+    283            for ( unsigned char i=start; i<=end; i++ )
+   \   000004 45 .. ..     MOV       S:?b1, S:?b4
+   \                     ??CheckSum_0:
+   \   000007 B6 ..        LD        A, S:?b0
+   \   000009 B1 ..        CP        A, S:?b1
+   \   00000B 25 16        JRC       L:??CheckSum_1
+    284              sum += num[i];
+   \   00000D 905F         CLRW      Y
+   \   00000F B6 ..        LD        A, S:?b1
+   \   000011 9097         LD        YL, A
+   \   000013 BF ..        LDW       S:?w1, X
+   \   000015 72B9 ....    ADDW      Y, S:?w1
+   \   000019 90F6         LD        A, (Y)
+   \   00001B BB ..        ADD       A, S:?b5
+   \   00001D B7 ..        LD        S:?b5, A
+   \   00001F 3C ..        INC       S:?b1
+   \   000021 20 E4        JRA       L:??CheckSum_0
+    285            return sum;
+   \                     ??CheckSum_1:
+   \   000023 B6 ..        LD        A, S:?b5
+   \   000025 81           RET
+    286          }
+    287          
+    288          /**
+    289            * @brief  compare array
+    290            * values.
+    291            * @param  
+    292            *    *array1  - first array
+    293            *    *array2  - second array
+    294            *    counter  - How many bytes to be compare
+    295            * @retval 
+    296            *    Compare_TypeDef
+    297            */
+
+   \                                 In section .near_func.text, align 1
+    298          Compare_TypeDef ArrayCompare( unsigned char* array1, unsigned char* array2, unsigned char counter )
+    299          {
+   \                     ArrayCompare:
+   \   000000 BF ..        LDW       S:?w1, X
+   \   000002 90BF ..      LDW       S:?w2, Y
+   \   000005 B7 ..        LD        S:?b1, A
+    300            for ( unsigned char i=0; i<counter; i++ ){
+   \   000007 3F ..        CLR       S:?b0
+   \                     ??ArrayCompare_0:
+   \   000009 B6 ..        LD        A, S:?b0
+   \   00000B B1 ..        CP        A, S:?b1
+   \   00000D 24 3A        JRNC      L:??ArrayCompare_1
+    301              if ( array1[i]>array2[i] )
+   \   00000F 5F           CLRW      X
+   \   000010 B6 ..        LD        A, S:?b0
+   \   000012 97           LD        XL, A
+   \   000013 72BB ....    ADDW      X, S:?w1
+   \   000017 9093         LDW       Y, X
+   \   000019 5F           CLRW      X
+   \   00001A B6 ..        LD        A, S:?b0
+   \   00001C 97           LD        XL, A
+   \   00001D 72BB ....    ADDW      X, S:?w2
+   \   000021 F6           LD        A, (X)
+   \   000022 90F1         CP        A, (Y)
+   \   000024 24 04        JRNC      L:??ArrayCompare_2
+    302                return MAX;
+   \   000026 A6 01        LD        A, #0x1
+   \   000028 20 21        JRA       L:??ArrayCompare_3
+    303              else if ( array1[i]<array2[i] )
+   \                     ??ArrayCompare_2:
+   \   00002A 905F         CLRW      Y
+   \   00002C B6 ..        LD        A, S:?b0
+   \   00002E 9097         LD        YL, A
+   \   000030 72B9 ....    ADDW      Y, S:?w2
+   \   000034 5F           CLRW      X
+   \   000035 B6 ..        LD        A, S:?b0
+   \   000037 97           LD        XL, A
+   \   000038 72BB ....    ADDW      X, S:?w1
+   \   00003C F6           LD        A, (X)
+   \   00003D 90F1         CP        A, (Y)
+   \   00003F 24 04        JRNC      L:??ArrayCompare_4
+    304                return MIN;      
+   \   000041 A6 02        LD        A, #0x2
+   \   000043 20 06        JRA       L:??ArrayCompare_3
+    305            }
+   \                     ??ArrayCompare_4:
+   \   000045 3C ..        INC       S:?b0
+   \   000047 20 C0        JRA       L:??ArrayCompare_0
+    306            return EQUAL;
+   \                     ??ArrayCompare_1:
+   \   000049 A6 03        LD        A, #0x3
+   \                     ??ArrayCompare_3:
+   \   00004B 81           RET
+    307          }
+    308          
+    309          /************************** (C) COPYRIGHT 2014 DarrenTang *********************/
+    310          /********************************  END OF FILE  *******************************/
+
+   Section sizes:
+
+   Bytes  Function/Label
+   -----  --------------
+      76  ArrayCompare
+      42  BCD2String
+     112  ByteToHexStr
+      33  CRC8_Table
+      27  CalCRC_Bytes
+      58  CalCRC_OneByte
+      38  CheckSum
+      68  Dec2String
+      96  Hex2String
+     125  HexStrToByte
+     256  crc8_array
+      53  max
+
+ 
+ 256 bytes in section .near.rodata
+ 728 bytes in section .near_func.text
+ 
+ 728 bytes of CODE  memory
+ 256 bytes of CONST memory
+
+Errors: none
+Warnings: none

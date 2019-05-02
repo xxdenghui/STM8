@@ -1,0 +1,708 @@
+###############################################################################
+#
+# IAR C/C++ Compiler V3.10.1.201 for STM8                 22/Mar/2019  11:25:50
+# Copyright 2010-2017 IAR Systems AB.
+# Standalone license - IAR Embedded Workbench for STMicroelectronics STM8
+#
+#    Source file  =  G:\Darren\MCU\STM8\Software\Libraries\HAL\hal_uart.c
+#    Command line =  
+#        -f C:\Users\new06\AppData\Local\Temp\EW349D.tmp
+#        (G:\Darren\MCU\STM8\Software\Libraries\HAL\hal_uart.c -e -On --no_cse
+#        --no_unroll --no_inline --no_code_motion --no_tbaa --no_cross_call
+#        --debug --code_model small --data_model medium -o
+#        "G:\Darren\MCU\STM8\Software\Project\Demo(STM8L15x)\Debug\Obj"
+#        --dlib_config "D:\Program Files (x86)\IAR Systems\Embedded Workbench
+#        8.0\stm8\LIB\dlstm8smn.h" -D STM8L15 -lCN
+#        "G:\Darren\MCU\STM8\Software\Project\Demo(STM8L15x)\Debug\List" -lB
+#        "G:\Darren\MCU\STM8\Software\Project\Demo(STM8L15x)\Debug\List" -I
+#        "G:\Darren\MCU\STM8\Software\Project\Demo(STM8L15x)\..\..\Libraries\STM8L15x_StdPeriph_Driver\inc\"
+#        -I
+#        "G:\Darren\MCU\STM8\Software\Project\Demo(STM8L15x)\..\..\Libraries\Device\"
+#        -I
+#        "G:\Darren\MCU\STM8\Software\Project\Demo(STM8L15x)\..\..\Libraries\HAL\"
+#        -I
+#        "G:\Darren\MCU\STM8\Software\Project\Demo(STM8L15x)\..\..\Libraries\Bus\"
+#        -I
+#        "G:\Darren\MCU\STM8\Software\Project\Demo(STM8L15x)\..\..\Libraries\CRC\"
+#        -I "G:\Darren\MCU\STM8\Software\Project\Demo(STM8L15x)\User\" --vregs
+#        16)
+#    Locale       =  Chinese (Simplified)_CHN.936
+#    List file    =  
+#        G:\Darren\MCU\STM8\Software\Project\Demo(STM8L15x)\Debug\List\hal_uart.lst
+#    Object file  =  
+#        G:\Darren\MCU\STM8\Software\Project\Demo(STM8L15x)\Debug\Obj\hal_uart.o
+#
+###############################################################################
+
+G:\Darren\MCU\STM8\Software\Libraries\HAL\hal_uart.c
+      1          /**
+      2            ******************************************************************************
+      3            * @file    hal_uart.c
+      4            * @author  Darren Tang
+      5            * @version V1.0.1
+      6            * @date    2019-01-25
+      7            * @brief   This is the uart configration source file.
+      8            ******************************************************************************
+      9            * @attention
+     10            * 
+     11            * 
+     12            ******************************************************************************
+     13            */
+     14          
+     15          /* Includes ------------------------------------------------------------------*/
+     16          #include "hal_uart.h"
+     17          
+     18          /* Private typedef -----------------------------------------------------------*/
+     19          
+     20          /* Private define ------------------------------------------------------------*/
+     21          
+     22          /* Private macro -------------------------------------------------------------*/
+     23          #define UART_FLAG_TIMEOUT  ((uint16_t)0x1000)
+     24          /* Private variables ---------------------------------------------------------*/
+
+   \                                 In section .near.bss, align 1
+     25          uint16_t UART_Timeout;
+   \                     UART_Timeout:
+   \   000000              DS8 2
+     26          /* Private function prototypes -----------------------------------------------*/
+     27          
+     28          /* Private functions ---------------------------------------------------------*/ 
+     29          
+     30          /**
+     31            * @brief  Send a byte to Tx DR
+     32            * values 
+     33            * @param  
+     34            * -byte The data will be send
+     35            * @retval None
+     36            */
+     37          
+     38          /* STM8S UART1 send byte */
+     39          #ifdef __STM8S_UART1_H
+     40          ErrorStatus UART1_SendByte( uint8_t byte )
+     41          {
+     42            ErrorStatus ErrStatus = SUCCESS;
+     43            UART1_SendData8( byte );
+     44            UART_Timeout = UART_FLAG_TIMEOUT;
+     45            while ( UART1_GetFlagStatus( UART1_FLAG_TXE ) == RESET ){
+     46              if((UART_Timeout--) == 0){
+     47                ErrStatus = ERROR;
+     48                break;
+     49              }
+     50            }
+     51            return ErrStatus;
+     52          }
+     53          #endif	// __STM8S_UART1_H
+     54          
+     55          
+     56          /* STM8S UART2 send byte */
+     57          #ifdef __STM8S_UART2_H
+     58          ErrorStatus UART2_SendByte( uint8_t byte )
+     59          {
+     60            ErrorStatus ErrStatus = SUCCESS;
+     61            UART2_SendData8( byte );
+     62            UART_Timeout = UART_FLAG_TIMEOUT;
+     63            while ( UART2_GetFlagStatus( UART2_FLAG_TXE ) == RESET ){
+     64              if((UART_Timeout--) == 0){
+     65                ErrStatus = ERROR;
+     66                break;
+     67              }
+     68            }
+     69            return ErrStatus;
+     70          }
+     71          #endif	// __STM8S_UART2_H
+     72          
+     73          /* STM8S UART3 send byte */
+     74          #ifdef __STM8S_UART3_H
+     75          ErrorStatus UART3_SendByte( uint8_t byte )
+     76          {
+     77            ErrorStatus ErrStatus = SUCCESS;
+     78            UART3_SendData8( byte );
+     79            UART_Timeout = UART_FLAG_TIMEOUT;
+     80            while ( UART3_GetFlagStatus( UART3_FLAG_TXE ) == RESET ){
+     81              if((UART_Timeout--) == 0){
+     82                ErrStatus = ERROR;
+     83                break;
+     84              }
+     85            }
+     86            return ErrStatus;
+     87          }
+     88          #endif	// __STM8S_UART3_H
+     89          
+     90          /* STM8L USART1 send byte */
+     91          #if defined USART1
+
+   \                                 In section .near_func.text, align 1
+     92          ErrorStatus USART1_SendByte( uint8_t byte )
+     93          {
+   \                     USART1_SendByte:
+   \   000000 CD ....      CALL      L:?push_w4
+   \   000003 B7 ..        LD        S:?b9, A
+     94            ErrorStatus ErrStatus = SUCCESS;
+   \   000005 35 01 ....   MOV       S:?b8, #0x1
+     95            USART_SendData8( USART1, byte );
+   \   000009 B6 ..        LD        A, S:?b9
+   \   00000B AE 5230      LDW       X, #0x5230
+   \   00000E CD ....      CALL      L:USART_SendData8
+     96            UART_Timeout = UART_FLAG_TIMEOUT;
+   \   000011 AE 1000      LDW       X, #0x1000
+   \   000014 CF ....      LDW       L:UART_Timeout, X
+     97            while ( USART_GetFlagStatus(USART1, USART_FLAG_TC) == RESET ){
+   \                     ??USART1_SendByte_0:
+   \   000017 90AE 0040    LDW       Y, #0x40
+   \   00001B AE 5230      LDW       X, #0x5230
+   \   00001E CD ....      CALL      L:USART_GetFlagStatus
+   \   000021 A1 00        CP        A, #0x0
+   \   000023 26 10        JRNE      L:??USART1_SendByte_1
+     98              if((UART_Timeout--) == 0){
+   \   000025 CE ....      LDW       X, L:UART_Timeout
+   \   000028 9093         LDW       Y, X
+   \   00002A 93           LDW       X, Y
+   \   00002B 5A           DECW      X
+   \   00002C CF ....      LDW       L:UART_Timeout, X
+   \   00002F 905D         TNZW      Y
+   \   000031 26 E4        JRNE      L:??USART1_SendByte_0
+     99                ErrStatus = ERROR;
+   \   000033 3F ..        CLR       S:?b8
+    100                break;
+    101              }
+    102            }
+    103            return ErrStatus;
+   \                     ??USART1_SendByte_1:
+   \   000035 B6 ..        LD        A, S:?b8
+   \   000037 CC ....      JP        L:?epilogue_w4
+    104          }
+    105          #endif
+    106          
+    107          /* STM8L USART2 send byte */
+    108          #if defined USART2
+
+   \                                 In section .near_func.text, align 1
+    109          ErrorStatus USART2_SendByte( uint8_t byte )
+    110          {
+   \                     USART2_SendByte:
+   \   000000 CD ....      CALL      L:?push_w4
+   \   000003 B7 ..        LD        S:?b9, A
+    111            ErrorStatus ErrStatus = SUCCESS;
+   \   000005 35 01 ....   MOV       S:?b8, #0x1
+    112            USART_SendData8( USART2, byte );
+   \   000009 B6 ..        LD        A, S:?b9
+   \   00000B AE 53E0      LDW       X, #0x53e0
+   \   00000E CD ....      CALL      L:USART_SendData8
+    113            UART_Timeout = UART_FLAG_TIMEOUT;
+   \   000011 AE 1000      LDW       X, #0x1000
+   \   000014 CF ....      LDW       L:UART_Timeout, X
+    114            while ( USART_GetFlagStatus(USART2, USART_FLAG_TC) == RESET ){
+   \                     ??USART2_SendByte_0:
+   \   000017 90AE 0040    LDW       Y, #0x40
+   \   00001B AE 53E0      LDW       X, #0x53e0
+   \   00001E CD ....      CALL      L:USART_GetFlagStatus
+   \   000021 A1 00        CP        A, #0x0
+   \   000023 26 10        JRNE      L:??USART2_SendByte_1
+    115              if((UART_Timeout--) == 0){
+   \   000025 CE ....      LDW       X, L:UART_Timeout
+   \   000028 9093         LDW       Y, X
+   \   00002A 93           LDW       X, Y
+   \   00002B 5A           DECW      X
+   \   00002C CF ....      LDW       L:UART_Timeout, X
+   \   00002F 905D         TNZW      Y
+   \   000031 26 E4        JRNE      L:??USART2_SendByte_0
+    116                ErrStatus = ERROR;
+   \   000033 3F ..        CLR       S:?b8
+    117                break;
+    118              }
+    119            }
+    120            return ErrStatus;
+   \                     ??USART2_SendByte_1:
+   \   000035 B6 ..        LD        A, S:?b8
+   \   000037 CC ....      JP        L:?epilogue_w4
+    121          }
+    122          #endif
+    123          
+    124          /* STM8L USART3 send byte */
+    125          #if defined USART3
+
+   \                                 In section .near_func.text, align 1
+    126          ErrorStatus USART3_SendByte( uint8_t byte )
+    127          {
+   \                     USART3_SendByte:
+   \   000000 CD ....      CALL      L:?push_w4
+   \   000003 B7 ..        LD        S:?b9, A
+    128            ErrorStatus ErrStatus = SUCCESS;
+   \   000005 35 01 ....   MOV       S:?b8, #0x1
+    129            USART_SendData8( USART3, byte );
+   \   000009 B6 ..        LD        A, S:?b9
+   \   00000B AE 53F0      LDW       X, #0x53f0
+   \   00000E CD ....      CALL      L:USART_SendData8
+    130            UART_Timeout = UART_FLAG_TIMEOUT;
+   \   000011 AE 1000      LDW       X, #0x1000
+   \   000014 CF ....      LDW       L:UART_Timeout, X
+    131            while ( USART_GetFlagStatus(USART3, USART_FLAG_TC) == RESET ){
+   \                     ??USART3_SendByte_0:
+   \   000017 90AE 0040    LDW       Y, #0x40
+   \   00001B AE 53F0      LDW       X, #0x53f0
+   \   00001E CD ....      CALL      L:USART_GetFlagStatus
+   \   000021 A1 00        CP        A, #0x0
+   \   000023 26 10        JRNE      L:??USART3_SendByte_1
+    132              if((UART_Timeout--) == 0){
+   \   000025 CE ....      LDW       X, L:UART_Timeout
+   \   000028 9093         LDW       Y, X
+   \   00002A 93           LDW       X, Y
+   \   00002B 5A           DECW      X
+   \   00002C CF ....      LDW       L:UART_Timeout, X
+   \   00002F 905D         TNZW      Y
+   \   000031 26 E4        JRNE      L:??USART3_SendByte_0
+    133                ErrStatus = ERROR;
+   \   000033 3F ..        CLR       S:?b8
+    134                break;
+    135              }
+    136            }
+    137            return ErrStatus;
+   \                     ??USART3_SendByte_1:
+   \   000035 B6 ..        LD        A, S:?b8
+   \   000037 CC ....      JP        L:?epilogue_w4
+    138          }
+    139          #endif
+    140          
+    141          /* Public functions ----------------------------------------------------------*/
+    142          
+    143          /**
+    144            * @brief  Uart config
+    145            * values 
+    146            * @param  
+    147            *     Uartx = uart1,uart2,uart3
+    148            *     Baud  
+    149            *     Parity
+    150            *     lenth
+    151            *     stopbit
+    152            *     IT
+    153            * @retval none
+    154            */
+
+   \                                 In section .near_func.text, align 1
+    155          void uart_cfg( Uart_TypeDef Uartx, uint32_t Baud, IT_TypeDef IT )
+    156          {
+   \                     uart_cfg:
+   \   000000 CD ....      CALL      L:?push_l2
+   \   000003 CD ....      CALL      L:?push_w7
+   \   000006 3B ....      PUSH      S:?b12
+   \   000009 B7 ..        LD        S:?b12, A
+   \   00000B CD ....      CALL      L:?mov_l2_l0
+   \   00000E BF ..        LDW       S:?w7, X
+    157          
+    158            switch ( Uartx ){
+   \   000010 B6 ..        LD        A, S:?b12
+   \   000012 4A           DEC       A
+   \   000013 27 08        JREQ      L:??uart_cfg_0
+   \   000015 4A           DEC       A
+   \   000016 27 2A        JREQ      L:??uart_cfg_1
+   \   000018 4A           DEC       A
+   \   000019 27 4C        JREQ      L:??uart_cfg_2
+   \   00001B 20 6F        JRA       L:??uart_cfg_3
+    159          /* STM8S UART1 config */
+    160          #ifdef __STM8S_UART1_H
+    161              case uart1:
+    162                CLK_PeripheralClockConfig( CLK_PERIPHERAL_UART1, ENABLE );
+    163                UART1_Init( Baud, 
+    164                            UART1_WORDLENGTH_8D, 
+    165                            UART1_STOPBITS_1, 
+    166                            UART1_PARITY_NO, 
+    167                            UART1_SYNCMODE_CLOCK_DISABLE,
+    168                            UART1_MODE_TXRX_ENABLE );
+    169                if ( IT )   UART1_ITConfig( IT, ENABLE );
+    170                UART1_Cmd( ENABLE ); 
+    171                break;
+    172          #endif	// __STM8S_UART1_H
+    173                  
+    174          /* STM8S UART2 config */    
+    175          #ifdef __STM8S_UART2_H
+    176            case uart2:
+    177              CLK_PeripheralClockConfig( CLK_PERIPHERAL_UART2, ENABLE );
+    178              UART2_Init( Baud, 
+    179                          UART2_WORDLENGTH_8D, 
+    180                          UART2_STOPBITS_1, 
+    181                          UART2_PARITY_NO, 
+    182                          UART2_SYNCMODE_CLOCK_DISABLE, 
+    183                          UART2_MODE_TXRX_ENABLE );
+    184              if ( IT ) UART2_ITConfig( IT, ENABLE );
+    185              UART2_Cmd( ENABLE );
+    186              break;
+    187          #endif	// __STM8S_UART2_H
+    188                
+    189          /* STM8S UART3 config */
+    190          #ifdef __STM8S_UART3_H 
+    191            case uart3:
+    192              CLK_PeripheralClockConfig( CLK_PERIPHERAL_UART3, ENABLE );
+    193              UART3_Init( Baud, 
+    194                          UART3_WORDLENGTH_8D, 
+    195                          UART3_STOPBITS_1, 
+    196                          UART3_PARITY_NO, 
+    197                          UART3_MODE_TXRX_ENABLE );
+    198              if ( IT )   UART3_ITConfig( IT, ENABLE );
+    199              UART3_Cmd( ENABLE );
+    200              break;
+    201          #endif	// __STM8S_UART3_H
+    202          
+    203          /* STM8L USART1 config */
+    204          #ifdef USART1
+    205              case uart1:
+    206                CLK_PeripheralClockConfig( CLK_Peripheral_USART1, ENABLE );
+   \                     ??uart_cfg_0:
+   \   00001D 35 01 ....   MOV       S:?b0, #0x1
+   \   000021 A6 05        LD        A, #0x5
+   \   000023 CD ....      CALL      L:CLK_PeripheralClockConfig
+    207                USART_Init( USART1, Baud, USART_WordLength_8b, USART_StopBits_1, 
+    208                        USART_Parity_No, USART_Mode_RxTx );
+   \   000026 35 0C ....   MOV       S:?b6, #0xc
+   \   00002A 3F ..        CLR       S:?b5
+   \   00002C 3F ..        CLR       S:?b4
+   \   00002E 4F           CLR       A
+   \   00002F CD ....      CALL      L:?mov_l0_l2
+   \   000032 AE 5230      LDW       X, #0x5230
+   \   000035 CD ....      CALL      L:USART_Init
+    209                USART_Cmd( USART1, ENABLE );
+   \   000038 A6 01        LD        A, #0x1
+   \   00003A AE 5230      LDW       X, #0x5230
+   \   00003D CD ....      CALL      L:USART_Cmd
+    210                break;
+   \   000040 20 4A        JRA       L:??uart_cfg_4
+    211          #endif
+    212          	
+    213          /* STM8L USART2 config */
+    214          #ifdef USART2
+    215              case uart2:
+    216                CLK_PeripheralClockConfig( CLK_Peripheral_USART2, ENABLE );
+   \                     ??uart_cfg_1:
+   \   000042 35 01 ....   MOV       S:?b0, #0x1
+   \   000046 A6 23        LD        A, #0x23
+   \   000048 CD ....      CALL      L:CLK_PeripheralClockConfig
+    217                USART_Init( USART2, Baud, USART_WordLength_8b, USART_StopBits_1, 
+    218                        USART_Parity_No, USART_Mode_RxTx );
+   \   00004B 35 0C ....   MOV       S:?b6, #0xc
+   \   00004F 3F ..        CLR       S:?b5
+   \   000051 3F ..        CLR       S:?b4
+   \   000053 4F           CLR       A
+   \   000054 CD ....      CALL      L:?mov_l0_l2
+   \   000057 AE 53E0      LDW       X, #0x53e0
+   \   00005A CD ....      CALL      L:USART_Init
+    219                USART_Cmd( USART2, ENABLE );
+   \   00005D A6 01        LD        A, #0x1
+   \   00005F AE 53E0      LDW       X, #0x53e0
+   \   000062 CD ....      CALL      L:USART_Cmd
+    220                break;
+   \   000065 20 25        JRA       L:??uart_cfg_4
+    221          #endif
+    222          	  
+    223          /* STM8L USART3 config */
+    224          #ifdef USART3
+    225              case uart3:
+    226                CLK_PeripheralClockConfig( CLK_Peripheral_USART3, ENABLE );
+   \                     ??uart_cfg_2:
+   \   000067 35 01 ....   MOV       S:?b0, #0x1
+   \   00006B A6 24        LD        A, #0x24
+   \   00006D CD ....      CALL      L:CLK_PeripheralClockConfig
+    227                USART_Init( USART3, Baud, USART_WordLength_8b, USART_StopBits_1, 
+    228                        USART_Parity_No, USART_Mode_RxTx );
+   \   000070 35 0C ....   MOV       S:?b6, #0xc
+   \   000074 3F ..        CLR       S:?b5
+   \   000076 3F ..        CLR       S:?b4
+   \   000078 4F           CLR       A
+   \   000079 CD ....      CALL      L:?mov_l0_l2
+   \   00007C AE 53F0      LDW       X, #0x53f0
+   \   00007F CD ....      CALL      L:USART_Init
+    229                USART_Cmd( USART3, ENABLE );
+   \   000082 A6 01        LD        A, #0x1
+   \   000084 AE 53F0      LDW       X, #0x53f0
+   \   000087 CD ....      CALL      L:USART_Cmd
+    230                break;
+   \   00008A 20 00        JRA       L:??uart_cfg_4
+    231          #endif    
+    232              
+    233              default:
+    234                break;   
+    235            }
+    236          }
+   \                     ??uart_cfg_3:
+   \                     ??uart_cfg_4:
+   \   00008C 32 ....      POP       S:?b12
+   \   00008F CD ....      CALL      L:?pop_w7
+   \   000092 CC ....      JP        L:?epilogue_l2
+    237          
+    238          
+    239          /**
+    240            * @brief  uart print string
+    241            * values 
+    242            * @param  
+    243            *     string
+    244            * @retval None
+    245            */
+
+   \                                 In section .near_func.text, align 1
+    246          void uart_printf( Uart_TypeDef Uartx, char *string )
+    247          {
+   \                     uart_printf:
+   \   000000 CD ....      CALL      L:?push_l2
+   \   000003 3B ....      PUSH      S:?b12
+   \   000006 B7 ..        LD        S:?b12, A
+   \   000008 BF ..        LDW       S:?w5, X
+    248            char *stringbuff;
+    249            switch ( Uartx ){
+   \   00000A B6 ..        LD        A, S:?b12
+   \   00000C 4A           DEC       A
+   \   00000D 27 08        JREQ      L:??uart_printf_0
+   \   00000F 4A           DEC       A
+   \   000010 27 1C        JREQ      L:??uart_printf_1
+   \   000012 4A           DEC       A
+   \   000013 27 30        JREQ      L:??uart_printf_2
+   \   000015 20 45        JRA       L:??uart_printf_3
+    250              
+    251          /* STM8S UART1 send string */
+    252          #ifdef __STM8S_UART1_H 
+    253              case uart1:
+    254                for( stringbuff = string; *stringbuff; stringbuff++ ) 
+    255                  UART1_SendByte( *stringbuff );  
+    256                break;
+    257          #endif	// __STM8S_UART1_H
+    258          	  
+    259          /* STM8S UART2 send string */
+    260          #ifdef __STM8S_UART2_H 
+    261              case uart2:
+    262                for( stringbuff = string; *stringbuff; stringbuff++ ) 
+    263                  UART2_SendByte( *stringbuff );  
+    264                break;
+    265          #endif	// __STM8S_UART2_H
+    266          	  
+    267          /* STM8S UART3 send string */
+    268          #ifdef __STM8S_UART3_H 
+    269              case uart3:
+    270                for( stringbuff = string; *stringbuff; stringbuff++ ) 
+    271                  UART3_SendByte( *stringbuff );  
+    272                break;
+    273          #endif	// __STM8S_UART3_H
+    274          	  
+    275          /* STM8L USART1 send string */
+    276          #ifdef USART1 
+    277              case uart1:
+    278                for( stringbuff = string; *stringbuff; stringbuff++ ) 
+   \                     ??uart_printf_0:
+   \   000017 CD ....      CALL      L:?mov_w4_w5
+   \                     ??uart_printf_4:
+   \   00001A 923D ..      TNZ       [S:?w4.w]
+   \   00001D 27 0D        JREQ      L:??uart_printf_5
+    279                  USART1_SendByte( *stringbuff );  
+   \   00001F 92C6 ..      LD        A, [S:?w4.w]
+   \   000022 CD ....      CALL      L:USART1_SendByte
+   \   000025 BE ..        LDW       X, S:?w4
+   \   000027 5C           INCW      X
+   \   000028 BF ..        LDW       S:?w4, X
+   \   00002A 20 EE        JRA       L:??uart_printf_4
+    280                break;
+   \                     ??uart_printf_5:
+   \   00002C 20 2E        JRA       L:??uart_printf_6
+    281          #endif          
+    282          
+    283          /* STM8L USART2 send string */
+    284          #ifdef USART2 
+    285              case uart2:
+    286                for( stringbuff = string; *stringbuff; stringbuff++ ) 
+   \                     ??uart_printf_1:
+   \   00002E CD ....      CALL      L:?mov_w4_w5
+   \                     ??uart_printf_7:
+   \   000031 923D ..      TNZ       [S:?w4.w]
+   \   000034 27 0D        JREQ      L:??uart_printf_8
+    287                  USART2_SendByte( *stringbuff );  
+   \   000036 92C6 ..      LD        A, [S:?w4.w]
+   \   000039 CD ....      CALL      L:USART2_SendByte
+   \   00003C BE ..        LDW       X, S:?w4
+   \   00003E 5C           INCW      X
+   \   00003F BF ..        LDW       S:?w4, X
+   \   000041 20 EE        JRA       L:??uart_printf_7
+    288                break;
+   \                     ??uart_printf_8:
+   \   000043 20 17        JRA       L:??uart_printf_6
+    289          #endif       
+    290                
+    291          /* STM8L USART3 send string */
+    292          #ifdef USART3 
+    293              case uart3:
+    294                for( stringbuff = string; *stringbuff; stringbuff++ ) 
+   \                     ??uart_printf_2:
+   \   000045 CD ....      CALL      L:?mov_w4_w5
+   \                     ??uart_printf_9:
+   \   000048 923D ..      TNZ       [S:?w4.w]
+   \   00004B 27 0D        JREQ      L:??uart_printf_10
+    295                  USART3_SendByte( *stringbuff );  
+   \   00004D 92C6 ..      LD        A, [S:?w4.w]
+   \   000050 CD ....      CALL      L:USART3_SendByte
+   \   000053 BE ..        LDW       X, S:?w4
+   \   000055 5C           INCW      X
+   \   000056 BF ..        LDW       S:?w4, X
+   \   000058 20 EE        JRA       L:??uart_printf_9
+    296                break;
+   \                     ??uart_printf_10:
+   \   00005A 20 00        JRA       L:??uart_printf_6
+    297          #endif  
+    298                
+    299            default:
+    300                break;
+    301            }
+    302          }
+   \                     ??uart_printf_3:
+   \                     ??uart_printf_6:
+   \   00005C 32 ....      POP       S:?b12
+   \   00005F CC ....      JP        L:?epilogue_l2
+    303          
+    304          /**
+    305            * @brief  uart send buff
+    306            * values 
+    307            * @param  
+    308            *     data-  The buff data
+    309            *     lenth- The numbers of byte
+    310            * @retval None
+    311            */
+
+   \                                 In section .near_func.text, align 1
+    312          void uart_send_buff( Uart_TypeDef Uartx, uint8_t* data, uint8_t lenth )
+    313          {
+   \                     uart_send_buff:
+   \   000000 CD ....      CALL      L:?push_l2
+   \   000003 3B ....      PUSH      S:?b12
+   \   000006 B7 ..        LD        S:?b11, A
+   \   000008 BF ..        LDW       S:?w4, X
+   \   00000A 45 .. ..     MOV       S:?b12, S:?b0
+    314            uint8_t i;
+    315            switch ( Uartx ){
+   \   00000D B6 ..        LD        A, S:?b11
+   \   00000F 4A           DEC       A
+   \   000010 27 08        JREQ      L:??uart_send_buff_0
+   \   000012 4A           DEC       A
+   \   000013 27 1F        JREQ      L:??uart_send_buff_1
+   \   000015 4A           DEC       A
+   \   000016 27 36        JREQ      L:??uart_send_buff_2
+   \   000018 20 4C        JRA       L:??uart_send_buff_3
+    316          
+    317          /* STM8S UART1 send buff */    
+    318          #ifdef __STM8S_UART1_H 
+    319            case uart1:
+    320              for( i=0; i<lenth; i++ )
+    321                UART1_SendByte( data[i] );  
+    322              break;
+    323          #endif	// __STM8S_UART1_H
+    324          
+    325          /* STM8S UART2 send buff */     
+    326          #ifdef __STM8S_UART2_H 
+    327            case uart2:
+    328              for( i=0; i<lenth; i++ )
+    329                UART2_SendByte( data[i] );  
+    330              break;
+    331          #endif	// __STM8S_UART2_H
+    332          
+    333          /* STM8S UART3 send buff */     
+    334          #ifdef __STM8S_UART3_H 
+    335            case uart3:
+    336              for( i=0; i<lenth; i++ )
+    337                UART3_SendByte( data[i] );  
+    338              break;
+    339          #endif	// __STM8S_UART3_H	
+    340          	
+    341          /* STM8L USART1 send buff */    
+    342          #ifdef USART1 
+    343            case uart1:
+    344              for( i=0; i<lenth; i++ )
+   \                     ??uart_send_buff_0:
+   \   00001A 3F ..        CLR       S:?b10
+   \                     ??uart_send_buff_4:
+   \   00001C B6 ..        LD        A, S:?b10
+   \   00001E B1 ..        CP        A, S:?b12
+   \   000020 24 10        JRNC      L:??uart_send_buff_5
+    345                USART1_SendByte( data[i] );  
+   \   000022 5F           CLRW      X
+   \   000023 B6 ..        LD        A, S:?b10
+   \   000025 97           LD        XL, A
+   \   000026 72BB ....    ADDW      X, S:?w4
+   \   00002A F6           LD        A, (X)
+   \   00002B CD ....      CALL      L:USART1_SendByte
+   \   00002E 3C ..        INC       S:?b10
+   \   000030 20 EA        JRA       L:??uart_send_buff_4
+    346              break;
+   \                     ??uart_send_buff_5:
+   \   000032 20 32        JRA       L:??uart_send_buff_3
+    347          #endif
+    348          
+    349          /* STM8L USART2 send buff */    
+    350          #ifdef USART2 
+    351            case uart2:
+    352              for( i=0; i<lenth; i++ )
+   \                     ??uart_send_buff_1:
+   \   000034 3F ..        CLR       S:?b10
+   \                     ??uart_send_buff_6:
+   \   000036 B6 ..        LD        A, S:?b10
+   \   000038 B1 ..        CP        A, S:?b12
+   \   00003A 24 10        JRNC      L:??uart_send_buff_7
+    353                USART2_SendByte( data[i] );  
+   \   00003C 5F           CLRW      X
+   \   00003D B6 ..        LD        A, S:?b10
+   \   00003F 97           LD        XL, A
+   \   000040 72BB ....    ADDW      X, S:?w4
+   \   000044 F6           LD        A, (X)
+   \   000045 CD ....      CALL      L:USART2_SendByte
+   \   000048 3C ..        INC       S:?b10
+   \   00004A 20 EA        JRA       L:??uart_send_buff_6
+    354              break;
+   \                     ??uart_send_buff_7:
+   \   00004C 20 18        JRA       L:??uart_send_buff_3
+    355          #endif
+    356          
+    357          /* STM8L USART3 send buff */    
+    358          #ifdef USART3 
+    359            case uart3:
+    360              for( i=0; i<lenth; i++ )
+   \                     ??uart_send_buff_2:
+   \   00004E 3F ..        CLR       S:?b10
+   \                     ??uart_send_buff_8:
+   \   000050 B6 ..        LD        A, S:?b10
+   \   000052 B1 ..        CP        A, S:?b12
+   \   000054 24 10        JRNC      L:??uart_send_buff_9
+    361                USART3_SendByte( data[i] );  
+   \   000056 5F           CLRW      X
+   \   000057 B6 ..        LD        A, S:?b10
+   \   000059 97           LD        XL, A
+   \   00005A 72BB ....    ADDW      X, S:?w4
+   \   00005E F6           LD        A, (X)
+   \   00005F CD ....      CALL      L:USART3_SendByte
+   \   000062 3C ..        INC       S:?b10
+   \   000064 20 EA        JRA       L:??uart_send_buff_8
+    362              break;
+    363          #endif
+    364              
+    365            }
+    366          }
+   \                     ??uart_send_buff_9:
+   \                     ??uart_send_buff_3:
+   \   000066 32 ....      POP       S:?b12
+   \   000069 CC ....      JP        L:?epilogue_l2
+    367          
+    368            
+    369          /************************** (C) COPYRIGHT 2014 DarrenTang *********************/
+    370          /********************************  END OF FILE  *******************************/
+
+   Section sizes:
+
+   Bytes  Function/Label
+   -----  --------------
+       2  UART_Timeout
+      58  USART1_SendByte
+      58  USART2_SendByte
+      58  USART3_SendByte
+     149  uart_cfg
+      98  uart_printf
+     108  uart_send_buff
+
+ 
+   2 bytes in section .near.bss
+ 529 bytes in section .near_func.text
+ 
+ 529 bytes of CODE memory
+   2 bytes of DATA memory
+
+Errors: none
+Warnings: none
